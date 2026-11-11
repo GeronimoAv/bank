@@ -214,4 +214,17 @@ Code changes:
 ## 11. AI-assisted work
 
 AI is a tool, not the author. The human remains accountable for every change.
-c/cccc
+
+Every AI-assisted change follows the protocol in [`AGENTS.md`](AGENTS.md):
+
+1. The agent announces the objective and a plan before acting.
+2. The plan is a proposal open to changes and review.
+3. During execution, the agent reports every file it touches and every command it runs.
+4. The agent verifies the result and does not hide failures.
+5. The agent closes with a summary of changes, decisions, risks, and next steps.
+
+The agent must not commit, push, open pull requests, deploy, or run destructive commands without
+an explicit request. Product, architecture, security, money, and credential decisions require
+human approval.
+
+AI attribution trailers are not allowed. The human author is accountable for the change.
