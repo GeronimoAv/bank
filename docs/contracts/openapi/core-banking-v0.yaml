@@ -1,0 +1,344 @@
+openapi: 3.1.0
+info:
+  title: Core Banking API
+  version: 0.1.0
+  description: |
+    API del servicio core-banking-service.
+    Incluye endpoints públicos para clientes y endpoints internos para transfers-service.
+    Los endpoints internos no se exponen por ingress.
+  contact:
+    name: Vela Bank
+servers:
+  - url: http://localhost:8081
+    description: Local
+  - url: https://core.staging.vela-bank.local
+    description: Staging (placeholder)
+tags:
+  - name: Accounts
+    description: Consultas de cuentas del cliente autenticado.
+  - name: Transactions
+    description: Movimientos y extractos.
+  - name: Internal
+    description: Operaciones servicio a servicio.
+security:
+  - bearerAuth: []
+paths:
+  /v1/accounts:
+    get:
+      tags: [Accounts]
+      operationId: listAccounts
+      summary: Lista las cuentas del cliente autenticado
+      responses:
+        "200":
+          description: Lista de cuentas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /v1/accounts/{accountId}:
+    get:
+      tags: [Accounts]
+      operationId: getAccount
+      summary: Obtiene una cuenta del cliente autenticado
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      responses:
+        "200":
+          description: Cuenta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/accounts/{accountId}/transactions:
+    get:
+      tags: [Transactions]
+      operationId: listTransactions
+      summary: Lista movimientos de una cuenta
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+        - name: from
+          in: query
+          description: Fecha inicial inclusive
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          description: Fecha final inclusive
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Movimientos paginados
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionPage"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /internal/v1/transfers:
+    post:
+      tags: [Internal]
+      operationId: postInternalTransfer
+      summary: Registra un asiento atómico de transferencia interna
+      description: |
+        Endpoint interno. Registra débito y crédito en un único asiento contable.
+        Requiere un token de servicio con scope internal:transfers.
+      security:
+        - serviceAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InternalTransferRequest"
+      responses:
+        "201":
+          description: Asiento creado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalTransferResponse"
+        "200":
+          description: Reintento idempotente con el mismo payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalTransferResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: La clave de idempotencia ya existe con otro payload
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "422":
+          description: Regla de negocio incumplida
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "503":
+          description: Servicio no disponible
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /internal/v1/transfers/{idempotencyKey}:
+    get:
+      tags: [Internal]
+      operationId: getInternalTransferByIdempotencyKey
+      summary: Consulta el resultado de un posting por clave de idempotencia
+      security:
+        - serviceAuth: []
+      parameters:
+        - name: idempotencyKey
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 8
+            maxLength: 128
+      responses:
+        "200":
+          description: Asiento encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalTransferResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    serviceAuth:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: http://localhost:8080/realms/vela-bank/protocol/openid-connect/token
+          scopes:
+            internal:transfers: Registrar transferencias internas
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Clave única por cliente para reintentos seguros.
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 128
+  responses:
+    Unauthorized:
+      description: No autenticado o sin permisos
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+  schemas:
+    Money:
+      type: object
+      required: [amountMinor, currency]
+      properties:
+        amountMinor:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 3000
+        currency:
+          type: string
+          pattern: "^[A-Z]{3}$"
+          example: USD
+    Account:
+      type: object
+      required: [id, customerId, status, currency, availableBalance, ledgerBalance, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [ACTIVE, FROZEN, CLOSED]
+        currency:
+          type: string
+          pattern: "^[A-Z]{3}$"
+          example: USD
+        availableBalance:
+          $ref: "#/components/schemas/Money"
+        ledgerBalance:
+          $ref: "#/components/schemas/Money"
+        createdAt:
+          type: string
+          format: date-time
+    Transaction:
+      type: object
+      required: [id, accountId, direction, amount, description, occurredAt, journalEntryId]
+      properties:
+        id:
+          type: string
+          format: uuid
+        accountId:
+          type: string
+          format: uuid
+        journalEntryId:
+          type: string
+          format: uuid
+        direction:
+          type: string
+          enum: [DEBIT, CREDIT]
+        amount:
+          $ref: "#/components/schemas/Money"
+        description:
+          type: string
+          maxLength: 140
+        occurredAt:
+          type: string
+          format: date-time
+    TransactionPage:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+        nextCursor:
+          type: [string, "null"]
+    InternalTransferRequest:
+      type: object
+      required: [sourceAccountId, targetAccountId, amount, description, correlationId]
+      properties:
+        sourceAccountId:
+          type: string
+          format: uuid
+        targetAccountId:
+          type: string
+          format: uuid
+        amount:
+          $ref: "#/components/schemas/Money"
+        description:
+          type: string
+          maxLength: 140
+        correlationId:
+          type: string
+          format: uuid
+    InternalTransferResponse:
+      type: object
+      required: [journalEntryId, status, completedAt]
+      properties:
+        journalEntryId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [POSTED, DUPLICATE]
+        completedAt:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        code:
+          type: string
+          example: INSUFFICIENT_FUNDS
+        correlationId:
+          type: string

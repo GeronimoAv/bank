@@ -1,0 +1,255 @@
+openapi: 3.1.0
+info:
+  title: Transfers API
+  version: 0.1.0
+  description: |
+    API del servicio transfers-service.
+    Recibe solicitudes de transferencia idempotentes y expone su estado.
+  contact:
+    name: Vela Bank
+servers:
+  - url: http://localhost:8082
+    description: Local
+  - url: https://transfers.staging.vela-bank.local
+    description: Staging (placeholder)
+tags:
+  - name: Transfers
+    description: Transferencias internas.
+security:
+  - bearerAuth: []
+paths:
+  /v1/transfers:
+    post:
+      tags: [Transfers]
+      operationId: createTransfer
+      summary: Crea una transferencia interna
+      description: |
+        Requiere Idempotency-Key. Un reintento con la misma clave y el mismo payload devuelve
+        la misma transferencia. Un payload distinto con la misma clave devuelve 409.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferRequest"
+      responses:
+        "201":
+          description: Transferencia creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transfer"
+        "200":
+          description: Reintento idempotente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transfer"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: Clave de idempotencia reutilizada con otro payload
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "422":
+          description: Error de negocio o validación
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "503":
+          description: Servicio no disponible
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    get:
+      tags: [Transfers]
+      operationId: listTransfers
+      summary: Lista las transferencias del cliente autenticado
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/TransferStatus"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Transferencias paginadas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransferPage"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /v1/transfers/{transferId}:
+    get:
+      tags: [Transfers]
+      operationId: getTransfer
+      summary: Obtiene una transferencia por ID
+      parameters:
+        - name: transferId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Transferencia encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transfer"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Clave única por cliente para reintentos seguros.
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 128
+  responses:
+    Unauthorized:
+      description: No autenticado o sin permisos
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+  schemas:
+    Money:
+      type: object
+      required: [amountMinor, currency]
+      properties:
+        amountMinor:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 3000
+        currency:
+          type: string
+          pattern: "^[A-Z]{3}$"
+          example: USD
+    TransferStatus:
+      type: string
+      enum: [RECEIVED, VALIDATED, POSTING, COMPLETED, FAILED, UNKNOWN]
+    TransferRequest:
+      type: object
+      required: [sourceAccountId, targetAccountId, amount, description]
+      properties:
+        sourceAccountId:
+          type: string
+          format: uuid
+        targetAccountId:
+          type: string
+          format: uuid
+        amount:
+          $ref: "#/components/schemas/Money"
+        description:
+          type: string
+          maxLength: 140
+    Transfer:
+      type: object
+      required:
+        - id
+        - status
+        - sourceAccountId
+        - targetAccountId
+        - amount
+        - description
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          $ref: "#/components/schemas/TransferStatus"
+        sourceAccountId:
+          type: string
+          format: uuid
+        targetAccountId:
+          type: string
+          format: uuid
+        amount:
+          $ref: "#/components/schemas/Money"
+        description:
+          type: string
+          maxLength: 140
+        journalEntryId:
+          type: string
+          format: uuid
+        failureCode:
+          type: string
+          example: INSUFFICIENT_FUNDS
+        failureMessage:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    TransferPage:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transfer"
+        nextCursor:
+          type: [string, "null"]
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        code:
+          type: string
+          example: INSUFFICIENT_FUNDS
+        correlationId:
+          type: string
