@@ -118,7 +118,7 @@ Content-Type: application/json
 {
   "sourceAccountId": "uuid",
   "targetAccountId": "uuid",
-  "amount": { "amountMinor": 1250, "currency": "USD" },
+  "amount": { "amountMinor": 1250000, "currency": "COP" },
   "description": "Alquiler",
   "correlationId": "uuid"
 }

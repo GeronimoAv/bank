@@ -108,12 +108,10 @@ Ingress / API edge
 - Presupuesto de nube acotado; usar Floci y kind para la mayor parte del desarrollo.
 - El proyecto debe poder levantarse en una máquina de desarrollo razonable.
 
-## 9. Decisiones pendientes
+## 9. Decisiones fundacionales
 
-Ver [decisions-pending.md](decisions-pending.md). Las principales son:
+Las decisiones de organización, producto, stack y plataforma están cerradas en los ADRs
+[0008](adr/0008-repo-governance-and-naming.md), [0009](adr/0009-product-currency-and-simulation.md),
+[0010](adr/0010-application-stack.md) y [0011](adr/0011-platform-and-operations.md).
 
-- nombre definitivo de la organización;
-- moneda y mercado objetivo;
-- confirmación de AWS como nube principal;
-- stack backend definitivo;
-- nombres definitivos de los servicios.
+Las nuevas decisiones abiertas se registran en [decisions-pending.md](decisions-pending.md).

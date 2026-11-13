@@ -92,31 +92,31 @@ erDiagram
 
 - Se representa como **entero en unidades menores** (`amount_minor`) + código ISO 4217.
 - Nunca usar `float` ni `double`.
-- Ejemplo: USD 12,50 → `{ "amountMinor": 1250, "currency": "USD" }`.
+- Ejemplo: COP 12.500,00 → `{ "amountMinor": 1250000, "currency": "COP" }`.
 - Las operaciones aritméticas se hacen en enteros; el redondeo se define por producto.
 
 ## 6. Ejemplos
 
-### 6.1 Depósito de USD 100
+### 6.1 Depósito de COP 100.000
 
 | Cuenta | Dirección | Monto |
 | --- | --- | --- |
-| `CASH` (interna) | Débito | 10000 |
-| Cuenta del cliente | Crédito | 10000 |
+| `CASH` (interna) | Débito | 10000000 |
+| Cuenta del cliente | Crédito | 10000000 |
 
-### 6.2 Transferencia de USD 30 de A a B
+### 6.2 Transferencia de COP 30.000 de A a B
 
 | Cuenta | Dirección | Monto |
 | --- | --- | --- |
-| Cuenta A | Débito | 3000 |
-| Cuenta B | Crédito | 3000 |
+| Cuenta A | Débito | 3000000 |
+| Cuenta B | Crédito | 3000000 |
 
 ### 6.3 Reverso de la transferencia
 
 | Cuenta | Dirección | Monto |
 | --- | --- | --- |
-| Cuenta B | Débito | 3000 |
-| Cuenta A | Crédito | 3000 |
+| Cuenta B | Débito | 3000000 |
+| Cuenta A | Crédito | 3000000 |
 
 El reverso referencia el `journal_entry` original y registra motivo, actor y aprobación.
 

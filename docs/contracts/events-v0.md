@@ -67,7 +67,7 @@ Todo evento usa el mismo sobre:
     "transferId": "0b7e6c1a-2d3f-4a5b-8c9d-0e1f2a3b4c5d",
     "sourceAccountId": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
     "targetAccountId": "6f5e4d3c-2b1a-0f9e-8d7c-6b5a4f3e2d1c",
-    "amount": { "amountMinor": 3000, "currency": "USD" },
+    "amount": { "amountMinor": 3000000, "currency": "COP" },
     "journalEntryId": "9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d",
     "completedAt": "2026-11-09T15:04:05Z"
   }
@@ -116,12 +116,12 @@ Todo evento usa el mismo sobre:
       {
         "ledgerAccountId": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
         "direction": "DEBIT",
-        "amount": { "amountMinor": 3000, "currency": "USD" }
+        "amount": { "amountMinor": 3000000, "currency": "COP" }
       },
       {
         "ledgerAccountId": "6f5e4d3c-2b1a-0f9e-8d7c-6b5a4f3e2d1c",
         "direction": "CREDIT",
-        "amount": { "amountMinor": 3000, "currency": "USD" }
+        "amount": { "amountMinor": 3000000, "currency": "COP" }
       }
     ]
   }

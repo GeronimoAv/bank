@@ -157,11 +157,11 @@ components:
           type: integer
           format: int64
           minimum: 1
-          example: 3000
+          example: 3000000
         currency:
           type: string
           pattern: "^[A-Z]{3}$"
-          example: USD
+          example: COP
     TransferStatus:
       type: string
       enum: [RECEIVED, VALIDATED, POSTING, COMPLETED, FAILED, UNKNOWN]

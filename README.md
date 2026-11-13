@@ -60,6 +60,7 @@ Flujo resumido:
 - [x] Arquitectura y límites de servicios.
 - [x] Contratos v0.
 - [x] ADRs iniciales.
+- [x] Decisiones fundacionales (ADR-0008 a ADR-0011).
 - [ ] Crear la organización y los repositorios.
 - [ ] Walking skeleton en kind.
 - [ ] Ledger y transferencias.
