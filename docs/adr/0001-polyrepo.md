@@ -60,5 +60,5 @@ viven en `contracts`; los despliegues se declaran en `gitops`.
 
 ## Notas
 
-El nombre de la organización (`vela-bank`) y la visibilidad de los repos están pendientes de
-confirmación. Ver [decisiones pendientes](../decisions-pending.md).
+El nombre de la organización (`vela-bank`) y la visibilidad de los repos quedaron confirmados en el
+[ADR-0008](0008-repo-governance-and-naming.md).

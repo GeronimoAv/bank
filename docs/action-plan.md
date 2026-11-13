@@ -26,12 +26,13 @@ organización multi-repositorio.
 | 0.8 | Operación | `docs/operations/` | Hecho |
 | 0.9 | Gobierno de org | `docs/governance/` | Hecho |
 | 0.10 | Reparar `CONTRIBUTING.md` | Sección 11 + texto basura | Hecho |
+| 0.11 | Cerrar decisiones fundacionales | ADR-0008 a ADR-0011 | Hecho |
 
 ### WS-1 — Organización y repositorios
 
 | # | Tarea | Entregable | Depende de |
 | --- | --- | --- | --- |
-| 1.1 | Crear organización | Org `vela-bank` `[PROPUESTO]` | Decisión de nombre |
+| 1.1 | Crear organización | Org `vela-bank` | [ADR-0008](adr/0008-repo-governance-and-naming.md) |
 | 1.2 | Crear repo `.github` | Perfil, templates, reusable workflows | 1.1 |
 | 1.3 | Transferir `bank` → `docs` | Repo de documentación | 1.1 |
 | 1.4 | Crear `contracts` | OpenAPI/eventos v0 | 0.6 |
@@ -95,22 +96,22 @@ organización multi-repositorio.
 | 6.6 | Supply chain | SBOM, firma, admisión | 2.3 |
 | 6.7 | DR básico | RTO/RPO probados | 6.4 |
 
-## 3. Decisiones que bloquean
+## 3. Decisiones fundacionales
 
-| Decisión | Bloquea | Recomendación |
+Las decisiones que bloqueaban WS-1 y WS-2 están cerradas. El detalle vive en los ADRs:
+
+| Área | ADR | Decisiones |
 | --- | --- | --- |
-| Nombre de la org | WS-1 | `vela-bank` `[PROPUESTO]` |
-| Moneda/mercado | WS-3, WS-5 | Moneda única; ejemplos en USD `[PROPUESTO]` |
-| Stack backend | WS-2 | Java 21 + Spring Boot `[PROPUESTO]` |
-| Nube principal | WS-6 | AWS `[PROPUESTO]` |
-| Nombres de servicios | WS-1 | `core-banking-service` + `transfers-service` `[PROPUESTO]` |
-| Visibilidad de repos | WS-1 | Privados al inicio, públicos si es portfolio |
+| Gobierno y nombres | [ADR-0008](adr/0008-repo-governance-and-naming.md) | Org, servicios, visibilidad, licencia y dominio. |
+| Producto y simulación | [ADR-0009](adr/0009-product-currency-and-simulation.md) | Moneda COP, email, KYC y SLOs. |
+| Stack | [ADR-0010](adr/0010-application-stack.md) | Backend, frontend, base de datos, mensajería y auth. |
+| Plataforma | [ADR-0011](adr/0011-platform-and-operations.md) | Nube, IaC, Kubernetes local, registry, GitOps y observabilidad. |
 
-Ver [decisions-pending.md](decisions-pending.md).
+Ver [decisions-pending.md](decisions-pending.md) para decisiones nuevas.
 
 ## 4. Orden de ejecución recomendado
 
-1. Cerrar decisiones de la sección 3.
+1. Revisar los ADRs fundacionales (0008–0011).
 2. Crear organización y `.github`.
 3. Transferir este repo a `docs`.
 4. Crear `contracts` y `platform`.

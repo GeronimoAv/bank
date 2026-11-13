@@ -227,11 +227,11 @@ components:
           type: integer
           format: int64
           minimum: 1
-          example: 3000
+          example: 3000000
         currency:
           type: string
           pattern: "^[A-Z]{3}$"
-          example: USD
+          example: COP
     Account:
       type: object
       required: [id, customerId, status, currency, availableBalance, ledgerBalance, createdAt]
@@ -248,7 +248,7 @@ components:
         currency:
           type: string
           pattern: "^[A-Z]{3}$"
-          example: USD
+          example: COP
         availableBalance:
           $ref: "#/components/schemas/Money"
         ledgerBalance:

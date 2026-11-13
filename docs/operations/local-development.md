@@ -11,8 +11,8 @@ costos de nube.
 | --- | --- |
 | Docker o Podman | Contenedores. |
 | Docker Compose | Dependencias locales. |
-| Java 21 + Maven | Backend `[PROPUESTO]`. |
-| Node.js 22 + pnpm | Frontend `[PROPUESTO]`. |
+| Java 21 + Maven | Backend (ADR-0010). |
+| Node.js 22 + pnpm | Frontend (ADR-0010). |
 | kubectl | Kubernetes. |
 | kind o k3d | Clúster local. |
 | Helm | Charts. |
