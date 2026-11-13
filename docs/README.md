@@ -45,6 +45,7 @@ Este directorio es la fuente de verdad del proyecto. Si una decisión no está a
 - [ADR-0006 — GitOps y entornos](adr/0006-gitops-and-environments.md)
 - [ADR-0007 — Colaboración con IA](adr/0007-ai-collaboration.md)
 - [ADR-0008 — Gobierno de repositorios y nombres](adr/0008-repo-governance-and-naming.md)
+- [ADR-0009 — Producto, moneda y operación simulada](adr/0009-product-currency-and-simulation.md)
 
 ### Operación
 

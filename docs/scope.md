@@ -160,7 +160,7 @@ Como auditor, quiero reconstruir una operación y revertirla si fue errónea.
 
 ## 7. Supuestos
 
-- Moneda única (a definir; los ejemplos usan USD).
+- Moneda única COP (peso colombiano); mercado Colombia. Los ejemplos usan COP.
 - Un cliente puede tener una cuenta en el MVP.
 - Las transferencias internas son instantáneas.
 - No hay integración con redes de pago reales.
