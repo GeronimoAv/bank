@@ -17,7 +17,10 @@ conflicto y pedir una decisión explícita. El humano siempre es el responsable 
    defiende el plan: lo ajusta.
 3. **Ejecución visible.** Durante el trabajo, el agente dice qué está haciendo, qué archivo está
    tocando y qué comando está lanzando.
-4. **Cambios pequeños.** Un cambio = un propósito. Si el plan crece, se divide.
+4. **Cambios pequeños y revisables.** Un cambio = un propósito. El límite es el de
+   `CONTRIBUTING.md`: **≤ 5 archivos y ≤ 300 líneas por PR**. Si el plan lo supera, se divide en
+   slices y el humano revisa uno antes de que el agente empiece el siguiente. El agente no puede
+   ampliar ese límite por su cuenta.
 5. **Cierre con resumen.** Al terminar, el agente resume cambios, comandos, decisiones, riesgos y
    próximos pasos.
 6. **El humano decide.** Las decisiones de producto, arquitectura, seguridad, dinero, datos,
@@ -74,6 +77,11 @@ Reglas del plan:
 - Si el usuario pidió solo un análisis, el agente **no ejecuta**: termina en el plan.
 - Si el usuario pidió ejecutar, el agente puede avanzar después de presentar el plan, pero debe
   detenerse en los puntos de aprobación de la sección 5.
+- Todo plan debe declarar los slices y verificar que ninguno supere el límite de tamaño de
+  `CONTRIBUTING.md` (≤ 5 archivos, ≤ 300 líneas). Si un slice lo supera, el plan está incompleto:
+  se divide antes de ejecutar.
+- Si el usuario quiere revisar, el agente entrega **un slice por vez** y espera aprobación antes de
+  empezar el siguiente.
 
 ### Fase 3 — Ejecución
 
@@ -84,6 +92,8 @@ Durante la ejecución, el agente:
 - informa el comando exacto que va a ejecutar y por qué;
 - reporta el resultado del comando, incluyendo errores y códigos de salida relevantes;
 - mantiene el plan actualizado con checkboxes;
+- antes de commitear o abrir un PR, mide el diff con `git diff --shortstat`; si supera el límite de
+  tamaño, se detiene y propone la división;
 - si el plan cambia, se detiene, explica el cambio y pide aprobación.
 
 Formato recomendado:
@@ -161,6 +171,8 @@ El resumen debe ser honesto: si algo quedó incompleto, se dice.
 
 **Archivos que voy a tocar:**
 - `ruta/archivo`: <motivo>
+
+**Tamaño estimado:** <archivos y líneas; si supera el límite, se divide>
 
 **Comandos que voy a ejecutar:**
 - `<comando>`: <motivo y resultado esperado>
@@ -241,6 +253,8 @@ El agente debe detenerse antes de continuar cuando:
 7. Un test o validación falla dos veces seguidas por la misma causa.
 8. Se detecta un secreto, PII real o una vulnerabilidad.
 9. El agente no puede explicar el impacto del cambio.
+10. El diff supera el límite de tamaño de `CONTRIBUTING.md` (≤ 5 archivos, ≤ 300 líneas) o mezcla
+    más de un propósito.
 
 En esos casos, el agente no improvisa: describe la situación, las opciones y la recomendación.
 
@@ -301,6 +315,8 @@ Un cambio está terminado cuando:
 - [ ] Las validaciones disponibles pasan o el fallo está reportado.
 - [ ] No hay secretos ni PII real.
 - [ ] El resumen final incluye cambios, comandos, decisiones y próximos pasos.
+- [ ] El cambio respeta el límite de tamaño (≤ 5 archivos, ≤ 300 líneas) o tiene una excepción
+      aprobada por el humano y registrada en el PR.
 - [ ] El humano revisó y aprobó el cambio.
 
 ---
