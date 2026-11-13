@@ -82,8 +82,16 @@ Rules:
 
 Every change goes through a pull request, including documentation.
 
-**Size limit:** ≤ 300 changed lines and ≤ 5 files, excluding lockfiles and generated code.
-If the change is larger, split it.
+**Size limit (hard):** ≤ 300 changed lines and ≤ 5 files, excluding lockfiles and generated
+code. This is a reviewability rule, not a suggestion: a human must be able to read the whole diff
+in one sitting.
+
+- One PR = one purpose. Do not mix decisions, refactors, formatting and behaviour changes.
+- If the change exceeds the limit, split it into stacked PRs before opening it.
+- Exceptions require explicit approval from the reviewer, recorded in the PR description with the
+  reason and the follow-up plan. "It is all related" is not enough.
+- AI-assisted changes have no exception: the agent proposes the split and waits for approval
+  before continuing.
 
 **Title:** follows Conventional Commits, because the squash merge uses it as the commit on
 `main`.
@@ -222,6 +230,9 @@ Every AI-assisted change follows the protocol in [`AGENTS.md`](AGENTS.md):
 3. During execution, the agent reports every file it touches and every command it runs.
 4. The agent verifies the result and does not hide failures.
 5. The agent closes with a summary of changes, decisions, risks, and next steps.
+6. The agent proposes slices within the size limit and waits for human review before starting the
+   next slice.
+7. If a slice would exceed the size limit, the agent stops and asks; it does not open a larger PR.
 
 The agent must not commit, push, open pull requests, deploy, or run destructive commands without
 an explicit request. Product, architecture, security, money, and credential decisions require

@@ -136,6 +136,7 @@ Ver [decisions-pending.md](decisions-pending.md).
 ## 6. Definition of Done de un slice
 
 - [ ] Alcance y criterios de aceptación escritos.
+- [ ] El diff respeta ≤ 5 archivos y ≤ 300 líneas, o tiene una excepción aprobada.
 - [ ] Contrato actualizado si aplica.
 - [ ] Código y tests.
 - [ ] Documentación y ADR si aplica.
