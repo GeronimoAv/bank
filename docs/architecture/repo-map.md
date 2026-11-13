@@ -1,7 +1,7 @@
 # Mapa de repositorios de la organización
 
-> Organización propuesta: `vela-bank` `[PROPUESTO]`. Todos los nombres son provisionales hasta
-> confirmación.
+> Organización: `vela-bank`. Nombres confirmados en el
+> [ADR-0008](../adr/0008-repo-governance-and-naming.md).
 
 ## 1. Principio
 

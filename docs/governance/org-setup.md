@@ -1,6 +1,6 @@
 # Configuración de la organización
 
-> Organización propuesta: `vela-bank` `[PROPUESTO]`.
+> Organización: `vela-bank`, confirmada en el [ADR-0008](../adr/0008-repo-governance-and-naming.md).
 
 ## 1. Crear la organización
 
