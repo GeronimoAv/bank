@@ -14,6 +14,8 @@ servers:
   - url: https://core.staging.vela-bank.local
     description: Staging (placeholder)
 tags:
+  - name: Customers
+    description: Datos del cliente autenticado.
   - name: Accounts
     description: Consultas de cuentas del cliente autenticado.
   - name: Transactions
@@ -23,6 +25,20 @@ tags:
 security:
   - bearerAuth: []
 paths:
+  /v1/customers/me:
+    get:
+      tags: [Customers]
+      operationId: getCurrentCustomer
+      summary: Obtiene el cliente autenticado
+      responses:
+        "200":
+          description: Cliente autenticado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
   /v1/accounts:
     get:
       tags: [Accounts]
@@ -94,6 +110,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransactionPage"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /v1/accounts/{accountId}/statements:
+    get:
+      tags: [Transactions]
+      operationId: getAccountStatement
+      summary: Descarga el extracto de una cuenta en CSV
+      description: |
+        Genera un extracto con saldo inicial, movimientos y saldo final para el rango indicado.
+        El MVP solo soporta CSV. No se exponen datos de otras cuentas.
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+        - name: from
+          in: query
+          required: true
+          description: Fecha inicial inclusive
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          description: Fecha final inclusive
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Extracto en CSV
+          headers:
+            Content-Disposition:
+              description: Nombre del archivo descargado
+              schema:
+                type: string
+                example: attachment; filename="extracto-<accountId>-2026-11-01-2026-11-30.csv"
+          content:
+            text/csv:
+              schema:
+                type: string
+                description: |
+                  Columnas: date,description,direction,amountMinor,currency,balanceMinor.
+                  La primera fila incluye el saldo inicial y la última el saldo final.
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -206,6 +268,12 @@ components:
         minLength: 8
         maxLength: 128
   responses:
+    BadRequest:
+      description: Parámetros inválidos
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
     Unauthorized:
       description: No autenticado o sin permisos
       content:
@@ -219,6 +287,25 @@ components:
           schema:
             $ref: "#/components/schemas/Problem"
   schemas:
+    Customer:
+      type: object
+      required: [id, email, fullName, status, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        fullName:
+          type: string
+          maxLength: 160
+        status:
+          type: string
+          enum: [ACTIVE, SUSPENDED, CLOSED]
+        createdAt:
+          type: string
+          format: date-time
     Money:
       type: object
       required: [amountMinor, currency]
